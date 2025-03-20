@@ -1,12 +1,11 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.models.auth import User
+from app.models.user import User
 from app.schemas.auth import RegisterRequest
 from app.utils.hashing import hash_string, verify_string
-from uuid import uuid4
 
-async def add_user_to_db(form: RegisterRequest, db: AsyncSession):
+async def add_user_to_db(form: RegisterRequest, db: AsyncSession) -> None:
     user_info = await db.execute(select(User).filter(User.username == form.username))
     exis_user = user_info.scalar_one_or_none()
     if exis_user:
@@ -16,7 +15,6 @@ async def add_user_to_db(form: RegisterRequest, db: AsyncSession):
         )
 
     new_user = User(
-        user_id=str(uuid4()),
         username=form.username,
         password=hash_string(form.password),
         full_name=form.full_name
@@ -27,7 +25,7 @@ async def add_user_to_db(form: RegisterRequest, db: AsyncSession):
     await db.refresh(new_user)
 
 
-async def authenticate_user(username: str, password: str, db: AsyncSession):
+async def authenticate_user(username: str, password: str, db: AsyncSession) -> int:
     result = await db.execute(select(User).filter(User.username == username))
     user = result.scalar_one_or_none()
 
@@ -55,7 +53,7 @@ async def get_info_by_user_id(user_id: str, db: AsyncSession) -> dict:
             detail="User not found"
         )
     
-    return {'role': user.role, 'full_name': user.full_name}
+    return user
 
     
 

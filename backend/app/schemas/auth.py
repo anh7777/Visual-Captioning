@@ -11,16 +11,7 @@ class LoginRequest(BaseModel):
     password: str
 
 
-class RegisterResponse(BaseModel):
-    user_id: str
-    username: str
-    role: str
-
-    class Config:
-        from_attributes = True
-
-
-class Token(BaseModel):
+class AccessToken(BaseModel):
     access_token: str
     token_type: str
 

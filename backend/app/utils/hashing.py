@@ -16,5 +16,3 @@ def encrypt_string(data: str) -> str:
 
 def decrypt_string(encrypted_data: str) -> str:
     return cipher.decrypt(encrypted_data.encode()).decode()
-
-

@@ -1,71 +1,71 @@
-import { Routes, Route, Navigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
-import { setUser, setIsLoading, deleteState } from "../redux/appSlice";
+import { useEffect, useState, useCallback } from "react";
+import { setUser, deleteState } from "../redux/appSlice";
 import { fetchUserInfo } from "../services/userService";
 import { logout, refresh } from '../services/authService';
-import { Spin } from 'antd';
-import { LoadingOutlined } from '@ant-design/icons';
-import UserRoutes from '../routes/UserRoutes';
-import AdminRoutes from '../routes/AdminRoutes';
-import Login from "../pages/Login";
-import Signup from "../pages/Signup";
+import UserRoutes from './UserRoutes';
+import IntroRoutes from './IntroRoutes';
+import AdminRoutes from './AdminRoutes';
+import Loader from "../components/Loader";
 
 function AppRoutes() {
-    const isLoading = useSelector((state) => state.app.isLoading);
-    const user = useSelector((state) => state.app.user);
-    const dispatch = useDispatch();
+  const user = useSelector((state) => state.app.user);
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
 
-    useEffect(() => {
-        const handleLogout = async () => {
-            dispatch(deleteState());
-            await logout();
-            localStorage.removeItem('at');
+  const handleLogout = useCallback(async () => {
+    dispatch(deleteState());
+    await logout();
+    localStorage.removeItem('at');
+  }, [dispatch]);
+
+  const fetchUserData = useCallback(async () => {
+    setIsLoading(true);
+    
+    try {
+      const accessToken = localStorage.getItem('at');
+      if (!accessToken) {
+        await handleLogout();
+        return;
+      }
+      
+      try {
+        const userInfo = await fetchUserInfo(accessToken);
+        dispatch(setUser(userInfo));
+      } catch (error) {
+        try {
+          const newAccessToken = await refresh();
+          localStorage.setItem('at', newAccessToken);
+          const userInfo = await fetchUserInfo(newAccessToken);
+          dispatch(setUser(userInfo));
+        } catch (refreshError) {
+          await handleLogout();
+          window.location.reload();
         }
-
-        const fetchUserData = async () => {
-            try {
-                const userInfo = await fetchUserInfo(localStorage.getItem('at'));
-                dispatch(setUser(userInfo));
-            } catch {
-                try {
-                    const accessToken = await refresh();
-                    localStorage.setItem('at', accessToken);
-                    const userInfor = await fetchUserInfo(localStorage.getItem('at'));
-                    dispatch(setUser(userInfor));
-                } catch {
-                    await handleLogout();
-                    localStorage.removeItem('at');
-                    window.location.reload();
-                }
-            } finally {
-                dispatch(setIsLoading(false));
-            }
-        }
-
-        if (localStorage.getItem('at')) {
-            fetchUserData();
-        } else {
-            handleLogout();
-        }
-    }, [dispatch]);
-
-    if (isLoading) return <Spin indicator={<LoadingOutlined />} />;
-
-    if (!localStorage.getItem('at')) {
-        return (
-            <Routes>
-                <Route path="/" element={<Navigate to='/login' />} />
-                <Route path='/login' element={<Login />} />
-                <Route path='/signup' element={<Signup />} />
-                <Route path="/*" element={<Navigate to='/' />} />
-            </Routes>
-        );
+      }
+    } finally {
+      setIsLoading(false);
     }
+  }, [dispatch, handleLogout]);
 
-    return (
-        <>{user?.role === 'admin' ? <AdminRoutes /> : <UserRoutes />}</>
-    );
+  useEffect(() => {
+    const accessToken = localStorage.getItem('at');
+    if (accessToken) {
+      fetchUserData();
+    } else {
+      handleLogout();
+    }
+  }, [fetchUserData, handleLogout]);
+
+  if (!localStorage.getItem('at')) {
+    return <IntroRoutes />;
+  }
+
+  if (isLoading || !user) {
+    return <Loader />;
+  }
+
+  return user.role === 'admin' ? <AdminRoutes /> : <UserRoutes />;
 }
 
 export default AppRoutes;

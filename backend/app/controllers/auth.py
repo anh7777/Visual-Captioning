@@ -5,16 +5,17 @@ from app.schemas.auth import RegisterRequest
 from app.services.user import add_user_to_db, authenticate_user
 from app.services.token import add_refresh_token_to_db, check_revoked_refresh_token, revoke_refresh_token, revoke_all_refresh_tokens
 from app.core.dependencies import get_db
-from app.utils.token import verify_token, create_access_token, create_refresh_token
+from app.utils.jwt import verify_token, create_access_token, create_refresh_token
+from app.schemas.auth import AccessToken
 
 router = APIRouter()
 
-@router.post("/register")
+@router.post("/signup")
 async def register(form: RegisterRequest, db: AsyncSession = Depends(get_db)):
     await add_user_to_db(form, db)
     return {"message": "Register successfully."}
-
-@router.post("/login")
+ 
+@router.post("/login", response_model=AccessToken)
 async def login(res: Response, form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
     sub = await authenticate_user(form_data.username, form_data.password, db)
     rt = create_refresh_token(sub)
@@ -34,7 +35,7 @@ async def login(res: Response, form_data: OAuth2PasswordRequestForm = Depends(),
 
     at = create_access_token(sub)
 
-    return {"access_token": at, "token_type": 'bearer'}
+    return AccessToken(access_token=at, token_type='bearer')
 
 @router.post("/logout")
 async def logout(res: Response, req: Request, db: AsyncSession = Depends(get_db)):
@@ -55,7 +56,7 @@ async def logout_all(req: Request, res: Response, db: AsyncSession = Depends(get
     return {"message": "Logout all successfully."}
 
 
-@router.post("/refresh")
+@router.post("/refresh", response_model=AccessToken)
 async def refresh(req: Request, res: Response, db: AsyncSession = Depends(get_db)):
     cur_rt = req.cookies.get('refresh_token')
     cur_pay = verify_token(cur_rt)
@@ -86,4 +87,4 @@ async def refresh(req: Request, res: Response, db: AsyncSession = Depends(get_db
 
     new_at = create_access_token(sub)
 
-    return {"access_token": new_at, 'token_type': 'bearer'}
+    return AccessToken(access_token=new_at, token_type='bearer')
