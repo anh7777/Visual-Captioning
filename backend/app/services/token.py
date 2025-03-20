@@ -31,7 +31,7 @@ async def check_revoked_refresh_token(jti: str, db: AsyncSession) -> bool:
 
 
 
-async def revoke_all_refresh_tokens(sub: str, db: AsyncSession):
+async def revoke_all_refresh_tokens(sub: int, db: AsyncSession):
     query = await db.execute(select(RefreshToken).filter(RefreshToken.sub == sub))
     exis_rts = query.scalars().all()
 
@@ -48,7 +48,7 @@ async def revoke_all_refresh_tokens(sub: str, db: AsyncSession):
     await db.commit()
 
 
-async def add_refresh_token_to_db(json_token_id: str, user_id: str, db: AsyncSession):
+async def add_refresh_token_to_db(json_token_id: str, user_id: int, db: AsyncSession):
     new_rt = RefreshToken(
         jti=json_token_id,
         sub=user_id,

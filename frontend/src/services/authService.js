@@ -22,9 +22,9 @@ export async function login(username, password) {
 export async function signup(formData) {
     try {
         const response = await API.post('/auth/signup ', formData);
-        return response
-    } catch (error) {
-        throw error
+        return response;
+    } catch (err) {
+        throw err;
     }
 }
 
