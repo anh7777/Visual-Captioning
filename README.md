@@ -27,7 +27,7 @@ Tạo file `.env` ở thư mục gốc và thêm nội dung sau:
 # PostgreSQL
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=123456
-POSTGRES_DB=test_database
+POSTGRES_DB=postgres
 POSTGRES_HOST=db
 POSTGRES_PORT=5432
 
@@ -36,7 +36,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 REFRESH_TOKEN_EXPIRE_DAYS=7
 
 # Any key you want
-JWT_SECRET_KEY="your-secret-key"
+JWT_SECRET_KEY=si3jf9@2kf#92jf0vA$1
 ALGORITHM=HS256
 
 # Base64-encoded 32 bytes
@@ -89,7 +89,10 @@ docker stop <container_id>  # Dừng container chiếm dụng
 
 ## 5. Mở rộng
 - **Frontend**: Vào thư mục `frontend` và chạy `npm run dev`
-- **Backend**: Vào thư mục `backend` và chạy `uvicorn main:app --reload`
+- **Backend**: Vào thư mục `backend` 
+$ pip install -r .\requirements.txt
+$ cd .\app\
+$ uvicorn main:app --reload
 
 Chúc bạn cài đặt thành công! 🚀
 
