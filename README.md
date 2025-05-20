@@ -17,7 +17,9 @@ Visual Captioning là dự án tạo chú thích tự động cho ảnh sử d�
 ```
 visual-captioning/
 ├── algorithms/             # Huấn luyện mô hình
-
+│
+│── crawling/               # Cào dữ liệu
+│
 └── application/            # Ứng dụng web
     ├── backend/            # API và server backend
     │   ├── app/            # Mã nguồn chính
