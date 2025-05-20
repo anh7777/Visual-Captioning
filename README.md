@@ -146,7 +146,3 @@ Chúng tôi hoan nghênh mọi đóng góp cho dự án! Hãy làm theo các bư
 3. Commit thay đổi (`git commit -m 'Add some amazing feature'`)
 4. Push lên branch (`git push origin feature/amazing-feature`)
 5. Tạo Pull Request
-
-## Giấy phép
-
-Dự án này được phân phối dưới giấy phép MIT. Xem file `LICENSE` để biết thêm chi tiết.
