@@ -1,0 +1,41 @@
+# Bytecode files
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+.venv/
+
+# Editor/IDE config
+.vscode/
+.idea/
+*.swp
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Node modules
+**/node_modules
+
+# Cache & logs
+*.log
+*.cache/
+.cache/
+pip-log.txt
+
+# Test files
+tests/
+*.test.py
+
+build/
+dist/
+*.egg-info/
+
+# Frontend build output
+frontend/dist/
+frontend/.vite/
